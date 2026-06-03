@@ -1,131 +1,175 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/lib/language-context";
 
 type PricingCategory = "student" | "adult" | "business";
+type BillingMode = "single" | "monthly";
+type LessonPlan = {
+  id: string;
+  basePrice: number;
+  name: string;
+  duration: string;
+  description: string;
+  features: string[];
+  cta: string;
+  highlighted?: boolean;
+  packageEligible?: boolean;
+};
 
-const categoryInfo: Record<PricingCategory, { label: string; description: string }> = {
+const MONTHLY_DISCOUNT = 0.25;
+
+const pricingData: Record<PricingCategory, { trial: number; conversation?: number; conversationInPerson?: number; grammar?: number; grammarInPerson?: number; businessCurriculum?: number; businessCurriculumInPerson?: number }> = {
   student: {
-    label: "学生向け",
-    description: "中学生・高校生・大学生向けのレッスン",
+    trial: 1000,
+    conversation: 2000,
+    conversationInPerson: 6000,
+    grammar: 3500,
+    grammarInPerson: 7500,
   },
   adult: {
-    label: "大人向け",
-    description: "日常英会話や旅行英語を学びたい方向け",
+    trial: 2000,
+    conversation: 5000,
+    conversationInPerson: 9000,
+    grammar: 8500,
+    grammarInPerson: 12500,
   },
   business: {
-    label: "ビジネス英語・TOEIC対策",
-    description: "仕事・資格試験・キャリアアップを目的とした方向け",
+    trial: 4000,
+    businessCurriculum: 12000,
+    businessCurriculumInPerson: 16000,
   },
 };
 
-const pricingData: Record<PricingCategory, {
-  trial: string;
-  online: string;
-  inPerson: string;
-  monthly: string;
-}> = {
-  student: {
-    trial: "¥1,000",
-    online: "¥3,000",
-    inPerson: "¥3,500",
-    monthly: "¥10,000",
-  },
-  adult: {
-    trial: "¥1,500",
-    online: "¥4,000",
-    inPerson: "¥5,000",
-    monthly: "¥14,000",
-  },
-  business: {
-    trial: "¥2,000",
-    online: "¥5,500",
-    inPerson: "¥6,500",
-    monthly: "¥20,000",
-  },
-};
+function formatYen(price: number) {
+  return `¥${price.toLocaleString("ja-JP")}`;
+}
 
-const getPricingPlans = (category: PricingCategory) => [
-  {
-    name: "体験レッスン",
-    price: pricingData[category].trial,
-    duration: "30分",
-    description: "まずは気軽にお試しください",
-    features: [
-      "レベルチェック",
-      "学習カウンセリング",
-      "レッスン体験",
-      "質問・相談",
-    ],
-    cta: "体験を予約する",
-    highlighted: false,
-  },
-  {
-    name: "オンラインレッスン",
-    price: pricingData[category].online,
-    duration: "60分",
-    description: "自宅から便利に受講",
-    features: [
-      "Zoomで受講",
-      "柔軟なスケジュール",
-      "教材込み",
-      "復習サポート",
-    ],
-    cta: "詳細を見る",
-    highlighted: true,
-  },
-  {
-    name: "対面レッスン",
-    price: pricingData[category].inPerson,
-    duration: "60分",
-    description: "対面で集中して学習",
-    features: [
-      "直接指導",
-      "一部エリア対応",
-      "教材込み",
-      "復習サポート",
-    ],
-    cta: "詳細を見る",
-    highlighted: false,
-  },
-];
-
-const getMonthlyPackage = (category: PricingCategory) => ({
-  name: "月額パッケージ",
-  price: pricingData[category].monthly,
-  duration: "月4回",
-  description: `定期的に学びたい方におすすめ。1回あたり¥${(parseInt(pricingData[category].monthly.replace(/[¥,]/g, "")) / 4).toLocaleString()}でお得に受講できます。`,
-  features: [
-    "月4回のレッスン（60分×4）",
-    "オンライン/対面選択可",
-    "優先予約",
-    "メールサポート付き",
-  ],
-});
+function packagePrice(singleLessonPrice: number) {
+  return Math.round(singleLessonPrice * 4 * (1 - MONTHLY_DISCOUNT));
+}
 
 export function PricingSection() {
-  const [selectedCategory, setSelectedCategory] = useState<PricingCategory>("adult");
-  const pricingPlans = getPricingPlans(selectedCategory);
-  const monthlyPackage = getMonthlyPackage(selectedCategory);
+  const [selectedCategory, setSelectedCategory] = useState<PricingCategory>("student");
+  const [billingMode, setBillingMode] = useState<BillingMode>("single");
+  const { t } = useLanguage();
+
+  const categoryInfo: Record<PricingCategory, { label: string; description: string }> = {
+    student: t.pricing.categories.student,
+    adult: t.pricing.categories.adult,
+    business: t.pricing.categories.business,
+  };
+
+  const billingInfo: Record<BillingMode, { label: string; description: string }> = {
+    single: t.pricing.billing.single,
+    monthly: t.pricing.billing.monthly,
+  };
+
+  const plans = useMemo<LessonPlan[]>(() => {
+    const prices = pricingData[selectedCategory];
+
+    if (selectedCategory === "business") {
+      return [
+        {
+          id: "trial",
+          basePrice: prices.trial,
+          ...t.pricing.plans.trialBusiness,
+          packageEligible: false,
+        },
+        {
+          id: "businessCurriculum",
+          basePrice: prices.businessCurriculum!,
+          ...t.pricing.plans.businessCurriculum,
+          highlighted: true,
+          packageEligible: true,
+        },
+        {
+          id: "businessCurriculumInPerson",
+          basePrice: prices.businessCurriculumInPerson!,
+          ...t.pricing.plans.businessCurriculumInPerson,
+          packageEligible: true,
+        },
+      ];
+    }
+
+    const studentCategory = selectedCategory === "student";
+
+    return [
+      {
+        id: "trial",
+        basePrice: prices.trial,
+        ...(studentCategory ? t.pricing.plans.trialStudent : t.pricing.plans.trialAdult),
+        packageEligible: false,
+      },
+      {
+        id: "conversation",
+        basePrice: prices.conversation!,
+        ...(studentCategory ? t.pricing.plans.studentConversation : t.pricing.plans.adultConversation),
+        highlighted: true,
+        packageEligible: true,
+      },
+      {
+        id: "conversationInPerson",
+        basePrice: prices.conversationInPerson!,
+        ...(studentCategory ? t.pricing.plans.studentConversationInPerson : t.pricing.plans.adultConversationInPerson),
+        packageEligible: true,
+      },
+      {
+        id: "grammar",
+        basePrice: prices.grammar!,
+        ...(studentCategory ? t.pricing.plans.studentGrammar : t.pricing.plans.adultGrammar),
+        packageEligible: true,
+      },
+      {
+        id: "grammarInPerson",
+        basePrice: prices.grammarInPerson!,
+        ...(studentCategory ? t.pricing.plans.studentGrammarInPerson : t.pricing.plans.adultGrammarInPerson),
+        packageEligible: true,
+      },
+    ];
+  }, [selectedCategory, t]);
+
+  const displayedPrice = (plan: LessonPlan) => {
+    if (billingMode === "monthly" && plan.packageEligible) {
+      return formatYen(packagePrice(plan.basePrice));
+    }
+    return formatYen(plan.basePrice);
+  };
+
+  const displayedDuration = (plan: LessonPlan) => {
+    if (billingMode === "monthly" && plan.packageEligible) {
+      return t.pricing.monthlyDuration;
+    }
+    return plan.duration;
+  };
+
+  const displayedDescription = (plan: LessonPlan) => {
+    if (billingMode === "monthly" && plan.packageEligible) {
+      return `${plan.description} ${t.pricing.monthlyDescription}`;
+    }
+    if (billingMode === "monthly" && !plan.packageEligible) {
+      return `${plan.description} ${t.pricing.trialNotPackage}`;
+    }
+    return plan.description;
+  };
 
   return (
     <section id="pricing" className="py-20 md:py-28 bg-secondary/30">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <p className="text-primary font-medium mb-2 text-sm">料金プラン</p>
+          <p className="text-primary font-medium mb-2 text-sm">{t.pricing.tagline}</p>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-balance">
-            シンプルでわかりやすい料金体系
+            {t.pricing.title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-            入会金は不要です。レッスン料金のみで始められます。
+            {t.pricing.description}
           </p>
         </div>
 
-        {/* Category Toggle */}
-        <div className="flex flex-col items-center mb-12">
+        <div className="flex flex-col items-center mb-8">
           <div className="inline-flex flex-col sm:flex-row bg-card rounded-xl p-1.5 shadow-sm border border-border">
             {(Object.keys(categoryInfo) as PricingCategory[]).map((category) => (
               <button
@@ -146,31 +190,52 @@ export function PricingSection() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {pricingPlans.map((plan, index) => (
+        <div className="flex flex-col items-center mb-12">
+          <div className="inline-flex bg-card rounded-xl p-1.5 shadow-sm border border-border">
+            {(Object.keys(billingInfo) as BillingMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setBillingMode(mode)}
+                className={`relative px-5 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  billingMode === mode
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                {billingInfo[mode].label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground text-center max-w-lg">
+            {billingInfo[billingMode].description}
+          </p>
+        </div>
+
+        <div className={`grid sm:grid-cols-2 ${plans.length === 3 ? "lg:grid-cols-3" : "lg:grid-cols-5"} gap-6 mb-12`}>
+          {plans.map((plan) => (
             <Card
-              key={index}
+              key={plan.id}
               className={`relative ${
                 plan.highlighted
-                  ? "border-primary shadow-lg scale-105"
+                  ? "border-primary shadow-lg lg:scale-105"
                   : "border-border"
               }`}
             >
               {plan.highlighted && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
-                    人気
+                  <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap">
+                    {t.pricing.popular}
                   </span>
                 </div>
               )}
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-lg">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardDescription>{displayedDescription(plan)}</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                  <span className="text-muted-foreground ml-1">/ {plan.duration}</span>
+                  <span className="text-3xl font-bold text-foreground">{displayedPrice(plan)}</span>
+                  <span className="text-muted-foreground ml-1">/ {displayedDuration(plan)}</span>
                 </div>
                 <ul className="space-y-2 text-left">
                   {plan.features.map((feature, i) => (
@@ -183,46 +248,19 @@ export function PricingSection() {
               </CardContent>
               <CardFooter>
                 <Button
+                  asChild
                   className="w-full"
                   variant={plan.highlighted ? "default" : "outline"}
                 >
-                  {plan.cta}
+                  <a href="#contact">{plan.cta}</a>
                 </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
 
-        {/* Monthly Package */}
-        <div className="max-w-3xl mx-auto">
-          <Card className="border-border bg-card">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">{monthlyPackage.name}</CardTitle>
-              <CardDescription>{monthlyPackage.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center mb-6">
-                <span className="text-4xl font-bold text-foreground">{monthlyPackage.price}</span>
-                <span className="text-muted-foreground ml-1">/ {monthlyPackage.duration}</span>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {monthlyPackage.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                    <span className="text-sm text-muted-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="justify-center">
-              <Button size="lg">月額プランを申し込む</Button>
-            </CardFooter>
-          </Card>
-        </div>
-
-        {/* Note */}
         <p className="text-center text-sm text-muted-foreground mt-8">
-          ※ 料金は変更になる場合があります。詳細はお問い合わせください。
+          {t.pricing.note}
         </p>
       </div>
     </section>

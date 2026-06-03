@@ -38,8 +38,8 @@ export function Navigation() {
               </a>
             ))}
             <LanguageToggle />
-            <Button size="sm">
-              {t.nav.contact}
+            <Button asChild size="sm">
+              <a href="#contact">{t.nav.contact}</a>
             </Button>
           </div>
 
@@ -70,8 +70,8 @@ export function Navigation() {
                   {item.label}
                 </a>
               ))}
-              <Button className="w-full mt-2">
-                {t.nav.contact}
+              <Button asChild className="w-full mt-2">
+                <a href="#contact" onClick={() => setIsOpen(false)}>{t.nav.contact}</a>
               </Button>
             </div>
           </div>

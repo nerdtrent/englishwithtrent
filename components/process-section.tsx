@@ -1,49 +1,29 @@
-import { MessageSquare, ClipboardList, PlayCircle, FileText, CalendarCheck } from "lucide-react";
+"use client";
 
-const steps = [
-  {
-    icon: MessageSquare,
-    step: "01",
-    title: "お問い合わせ",
-    description: "フォームまたはメールでお気軽にご連絡ください。ご質問だけでも大歓迎です。",
-  },
-  {
-    icon: ClipboardList,
-    step: "02",
-    title: "無料カウンセリング",
-    description: "現在のレベルや目標、ご希望をお聞きして、最適なレッスンプランをご提案します。",
-  },
-  {
-    icon: PlayCircle,
-    step: "03",
-    title: "体験レッスン",
-    description: "実際のレッスンを体験していただき、相性や進め方を確認します。",
-  },
-  {
-    icon: FileText,
-    step: "04",
-    title: "学習プラン作成",
-    description: "あなた専用の学習プランを作成。目標達成までの道筋を一緒に考えます。",
-  },
-  {
-    icon: CalendarCheck,
-    step: "05",
-    title: "レッスン開始",
-    description: "ご都合に合わせてレッスンをスタート。継続しやすいペースで進めていきます。",
-  },
-];
+import { MessageSquare, ClipboardList, PlayCircle, FileText, CalendarCheck } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 
 export function ProcessSection() {
+  const { t } = useLanguage();
+
+  const steps = [
+    { icon: MessageSquare, ...t.process.steps.contact },
+    { icon: ClipboardList, ...t.process.steps.consultation },
+    { icon: PlayCircle, ...t.process.steps.trial },
+    { icon: FileText, ...t.process.steps.plan },
+    { icon: CalendarCheck, ...t.process.steps.start },
+  ];
+
   return (
     <section className="py-20 md:py-28 bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-primary font-medium mb-2 text-sm">ご利用の流れ</p>
+          <p className="text-primary font-medium mb-2 text-sm">{t.process.tagline}</p>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-balance">
-            レッスン開始までの5ステップ
+            {t.process.title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-            お申し込みからレッスン開始まで、丁寧にサポートいたします。
+            {t.process.description}
           </p>
         </div>
 

@@ -1,50 +1,30 @@
-import { Plane, Briefcase, Globe, GraduationCap, Sparkles, Film } from "lucide-react";
+"use client";
 
-const benefits = [
-  {
-    icon: Plane,
-    title: "海外旅行をもっと楽しく",
-    description: "現地での会話がスムーズになり、より深い旅行体験ができます。",
-  },
-  {
-    icon: Briefcase,
-    title: "仕事の幅が広がる",
-    description: "英語力はキャリアアップや転職の大きな武器になります。",
-  },
-  {
-    icon: Globe,
-    title: "世界中の人と繋がる",
-    description: "異なる文化の人々とコミュニケーションが取れるようになります。",
-  },
-  {
-    icon: GraduationCap,
-    title: "留学・海外移住の準備",
-    description: "海外での生活や学習に必要な英語力を身につけられます。",
-  },
-  {
-    icon: Sparkles,
-    title: "自信がつく",
-    description: "英語を話せる自分に自信が持て、新しいことに挑戦できます。",
-  },
-  {
-    icon: Film,
-    title: "英語コンテンツを楽しむ",
-    description: "映画、音楽、本などを原語で楽しめるようになります。",
-  },
-];
+import { Plane, Briefcase, Globe, GraduationCap, Sparkles, Film } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 
 export function BenefitsSection() {
+  const { t } = useLanguage();
+
+  const benefits = [
+    { icon: Plane, ...t.benefits.items.travel },
+    { icon: Briefcase, ...t.benefits.items.career },
+    { icon: Globe, ...t.benefits.items.connect },
+    { icon: GraduationCap, ...t.benefits.items.study },
+    { icon: Sparkles, ...t.benefits.items.confidence },
+    { icon: Film, ...t.benefits.items.media },
+  ];
+
   return (
     <section className="py-20 md:py-28 bg-background">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-primary font-medium mb-2 text-sm">英語を学ぶ理由</p>
+          <p className="text-primary font-medium mb-2 text-sm">{t.benefits.tagline}</p>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-balance">
-            英語ができると、世界が広がります
+            {t.benefits.title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-            英語は単なるスキルではなく、新しい可能性への扉です。
-            あなたの目標が何であれ、英語力があれば、その実現がより身近になります。
+            {t.benefits.description}
           </p>
         </div>
 

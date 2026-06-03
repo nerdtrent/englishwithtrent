@@ -1,46 +1,39 @@
+"use client";
+
 import { Monitor, Users, Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const formats = [
-  {
-    icon: Monitor,
-    title: "オンラインレッスン",
-    description: "Zoom等を使用した便利なオンラインレッスン",
-    features: [
-      { text: "スケジュールの柔軟性が高い", highlight: true },
-      { text: "自宅からリラックスして受講", highlight: true },
-      { text: "忙しい方におすすめ", highlight: true },
-      { text: "全国どこからでも受講可能", highlight: false },
-      { text: "録画で復習も可能（ご希望の場合）", highlight: false },
-    ],
-    recommended: true,
-  },
-  {
-    icon: Users,
-    title: "対面レッスン",
-    description: "直接お会いして行う対面形式のレッスン",
-    features: [
-      { text: "より直接的なコミュニケーション", highlight: true },
-      { text: "対面での学習を好む方向け", highlight: true },
-      { text: "一部エリアで対応可能", highlight: true },
-      { text: "教材をその場で共有", highlight: false },
-      { text: "身振り手振りも交えた指導", highlight: false },
-    ],
-    recommended: false,
-  },
-];
+import { useLanguage } from "@/lib/language-context";
 
 export function LessonFormatSection() {
+  const { t } = useLanguage();
+
+  const formats = [
+    {
+      icon: Monitor,
+      title: t.lessonFormat.online.title,
+      description: t.lessonFormat.online.description,
+      features: t.lessonFormat.online.features,
+      recommended: true,
+    },
+    {
+      icon: Users,
+      title: t.lessonFormat.inPerson.title,
+      description: t.lessonFormat.inPerson.description,
+      features: t.lessonFormat.inPerson.features,
+      recommended: false,
+    },
+  ];
+
   return (
     <section className="py-20 md:py-28 bg-card border-y border-border/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-primary font-medium mb-2 text-sm">レッスン形式</p>
+          <p className="text-primary font-medium mb-2 text-sm">{t.lessonFormat.tagline}</p>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-balance">
-            オンラインと対面、選べる受講スタイル
+            {t.lessonFormat.title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-            ライフスタイルやお好みに合わせて、レッスン形式をお選びいただけます。
+            {t.lessonFormat.description}
           </p>
         </div>
 
@@ -57,7 +50,7 @@ export function LessonFormatSection() {
               {format.recommended && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
-                    おすすめ
+                    {t.lessonFormat.recommended}
                   </span>
                 </div>
               )}

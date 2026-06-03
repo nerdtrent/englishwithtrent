@@ -1,30 +1,34 @@
-const navLinks = [
-  { label: "ホーム", href: "#" },
-  { label: "講師について", href: "#about" },
-  { label: "レッスン内容", href: "#lessons" },
-  { label: "料金", href: "#pricing" },
-  { label: "よくある質問", href: "#faq" },
-  { label: "お問い合わせ", href: "#contact" },
-];
+"use client";
+
+import { useLanguage } from "@/lib/language-context";
 
 export function Footer() {
+  const { t } = useLanguage();
+
+  const navLinks = [
+    { label: t.nav.home, href: "#" },
+    { label: t.nav.about, href: "#about" },
+    { label: t.nav.lessons, href: "#lessons" },
+    { label: t.nav.pricing, href: "#pricing" },
+    { label: t.nav.faq, href: "#faq" },
+    { label: t.nav.contact, href: "#contact" },
+  ];
+
   return (
     <footer className="bg-foreground text-background py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">English Lessons</h3>
+            <h3 className="text-xl font-semibold mb-4">{t.footer.brand}</h3>
             <p className="text-background/70 text-sm leading-relaxed">
-              日本人学習者のための
-              <br />
-              パーソナル英語レッスン
+              {t.footer.tagline}
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <h4 className="font-medium mb-4">サイトマップ</h4>
+            <h4 className="font-medium mb-4">{t.footer.sitemap}</h4>
             <ul className="space-y-2">
               {navLinks.map((link) => (
                 <li key={link.href}>
@@ -41,18 +45,18 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-medium mb-4">お問い合わせ</h4>
+            <h4 className="font-medium mb-4">{t.footer.contactTitle}</h4>
             <ul className="space-y-2 text-sm text-background/70">
-              <li>メール: example@email.com</li>
-              <li>LINE: @english_lesson</li>
-              <li>返信目安: 24時間以内</li>
+              <li>{t.footer.emailLabel} englishwithtrent@gmail.com</li>
+              <li>{t.footer.lineLabel} trentwdb</li>
+              <li>{t.footer.responseLabel} {t.footer.responseValue}</li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-background/20 pt-8">
           <p className="text-center text-sm text-background/50">
-            © {new Date().getFullYear()} English Lessons. All rights reserved.
+            © {new Date().getFullYear()} English Lessons. {t.footer.copyright}
           </p>
         </div>
       </div>

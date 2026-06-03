@@ -1,45 +1,29 @@
-import { Target, MessageCircle, BookText, Mic, ClipboardCheck } from "lucide-react";
+"use client";
 
-const methods = [
-  {
-    icon: Target,
-    title: "目標に合わせたカリキュラム",
-    description: "会話力向上、試験対策、ビジネス英語など、あなたの目標に合わせてレッスン内容をカスタマイズします。",
-  },
-  {
-    icon: MessageCircle,
-    title: "実践的な会話練習",
-    description: "実際の場面で使える表現を重視。自然な会話ができるよう、たくさん話す機会を作ります。",
-  },
-  {
-    icon: BookText,
-    title: "わかりやすい文法解説",
-    description: "複雑な文法も、日本語との違いを踏まえて丁寧に説明します。「なぜそうなるか」を理解できます。",
-  },
-  {
-    icon: Mic,
-    title: "発音・リスニング強化",
-    description: "日本人が苦手とする発音やリスニングを重点的にサポート。聞き取れる・伝わる英語を目指します。",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "復習サポート（希望者のみ）",
-    description: "ご希望に応じて、宿題や復習用の教材をお渡しします。レッスン以外の時間も効果的に学べます。",
-  },
-];
+import { Target, MessageCircle, BookText, Mic, ClipboardCheck } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 
 export function MethodSection() {
+  const { t } = useLanguage();
+
+  const methods = [
+    { icon: Target, ...t.method.items.customized },
+    { icon: MessageCircle, ...t.method.items.conversation },
+    { icon: BookText, ...t.method.items.grammar },
+    { icon: Mic, ...t.method.items.pronunciation },
+    { icon: ClipboardCheck, ...t.method.items.review },
+  ];
+
   return (
     <section className="py-20 md:py-28 bg-primary/5 border-y border-border/50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-primary font-medium mb-2 text-sm">指導方針</p>
+          <p className="text-primary font-medium mb-2 text-sm">{t.method.tagline}</p>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 text-balance">
-            実践的で、わかりやすいレッスン
+            {t.method.title}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-pretty">
-            「英語を使える」ようになることを最優先に考えています。
-            理論だけでなく、実際に使える英語力を身につけていただきます。
+            {t.method.description}
           </p>
         </div>
 
