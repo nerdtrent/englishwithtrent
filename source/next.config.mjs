@@ -3,14 +3,12 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ""
 
 const nextConfig = {
   // Creates a static export in the `out` folder when you run `npm run build`.
-  // This is suitable for GitHub Pages and other static hosts.
+  // For a dedicated/custom domain on GitHub Pages, keep basePath empty.
   output: "export",
   trailingSlash: true,
 
-  // For GitHub project pages, build with:
-  // NEXT_PUBLIC_BASE_PATH=/your-repo-name npm run build
-  // For a custom domain or local static build, just run:
-  // npm run build
+  // Only set NEXT_PUBLIC_BASE_PATH if you intentionally deploy under a subfolder.
+  // For a custom domain like https://yourdomain.com, do not set it.
   basePath,
   assetPrefix: basePath ? `${basePath}/` : undefined,
 
