@@ -1,0 +1,1 @@
+Place your real LINE QR code image at public/line-qr.png. The contact page already references /line-qr.png.
